@@ -1,0 +1,168 @@
+package MODEL;
+
+
+/**
+ * 
+ * @author K.Misho
+ * @date august '15
+ * @version 1.0
+ */
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.ParseException;
+import java.util.Vector;
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.thoughtworks.selenium.webdriven.commands.Open;
+
+public class Spider {
+	
+	// the site that is being analysed
+	private String site = "https://www.sbobet.com/euro/football";
+	
+	// the driver linked with the current site
+	private static WebDriver driver = null;
+	
+	//the master Robot
+	private Robot robot = null;
+	
+	// the script associated to every product
+	private Vector<Scrap> product_elements;
+	
+	// the list of  every product
+	private Vector<Match> products;
+	
+	// the user 
+	private User user = null;
+	
+	public Spider(String src,Robot rob) throws MalformedURLException, InterruptedException{
+		robot = rob;
+		//DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		//driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), capabilities);
+		System.setProperty("webdriver.chrome.driver", "/Users/Marceau/Documents/workspace_apache/chromedriver");
+		
+		driver = new ChromeDriver();
+		//driver = new HtmlUnitDriver();
+		//((HtmlUnitDriver) driver).setJavascriptEnabled(true);
+		//driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+	
+		// add the driver to be managed by robot at the end of a search
+		rob.addBrowser(driver);
+		//site = src;
+		products = new Vector<Match>();
+		product_elements = new Vector<Scrap>();
+	}
+	
+	public WebDriver getDriver(){
+		return driver;
+	}
+	
+	public void initUser(String username, String Password){
+		user = new User(username, Password);
+	}
+	
+	/**
+	 * @param username
+	 * @param Password
+	 *     	  Logins into the website, by entering provided username and
+	 *        password
+	 */
+	public void login() {
+		user.get_username_script(driver).sendKeys(user.getUsername());
+		user.get_password_script(driver).sendKeys(user.getPassword());
+		user.get_confirm_script(driver).click();
+	}
+	 
+	/**
+	 * Open the test website.
+	 * @throws InterruptedException 
+	 */
+	public void loadSite() throws InterruptedException {
+		// load the site
+		
+		driver.get(site);
+		
+		//wait about 2 sec for the javascript to load completly
+		waitJScript();
+	}
+	
+	public SboBet_Match searchEarlyMarket(Match product) throws ParseException, InterruptedException {
+		Scrap scrap_match = null; // the matched to be scraped
+		//site+=product.getLigue();
+		/*driver.navigate().refresh();
+
+		while(driver.findElements(By.id("bu:sm:markets")).size()==0){}
+		
+		driver.findElement(By.id("bu:sm:markets")).click();
+		 */
+		JavascriptExecutor jse = (JavascriptExecutor)driver;
+		jse.executeScript("scroll(250, 0)"); //x value '250' can be altered
+
+		while(driver.findElements(By.id("bu:sm:market:2")).size()==0){}
+
+		try{
+			driver.findElement(By.id("bu:sm:market:2")).click();
+		}catch(ElementNotVisibleException e){
+			driver.findElement(By.id("bu:sm:markets")).click();
+			System.err.println("New error found");
+			driver.findElement(By.id("bu:sm:market:2")).click();
+		}catch(StaleElementReferenceException e){
+			System.err.println("Element not attached : another request is being processed");
+			return null;
+		}
+
+		
+		scrap_match = new Scrap(driver,product);
+		product_elements.add(scrap_match);
+		return scrap_match.getScrapedMatch();
+	}
+	
+	public SboBet_Match searchToday(Match product) throws ParseException, InterruptedException {
+		Scrap scrap_match = null; // the matched to be scraped
+		//site+=product.getLigue();
+		/*driver.navigate().refresh();
+
+		while(driver.findElements(By.id("bu:sm:markets")).size()==0){}
+			driver.findElement(By.id("bu:sm:markets")).click();
+		 */	
+		JavascriptExecutor jse = (JavascriptExecutor)driver;
+		jse.executeScript("scroll(1000, 0)"); //x value '250' can be altered
+
+		while(driver.findElements(By.id("bu:sm:market:1")).size()==0){}
+		// possible error  !!!!!!!!!!!!
+		try{
+			driver.findElement(By.id("bu:sm:market:1")).click();
+		}catch(ElementNotVisibleException e){
+			driver.findElement(By.id("bu:sm:markets")).click();
+			System.err.println("New error found");
+			driver.findElement(By.id("bu:sm:market:1")).click();
+		}catch(StaleElementReferenceException e){
+			System.err.println("Element not attached : another request is being processed");
+			return null;
+		}
+
+		
+		scrap_match = new Scrap(driver,product);
+		product_elements.add(scrap_match);
+		return scrap_match.getScrapedMatch();
+	}
+	
+	public void waitJScript(){
+		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+	}
+
+}

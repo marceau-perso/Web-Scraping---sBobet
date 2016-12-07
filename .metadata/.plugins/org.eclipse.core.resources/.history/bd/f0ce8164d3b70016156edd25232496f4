@@ -1,0 +1,33 @@
+package MODEL;
+
+import java.util.Vector;
+
+public class MarketManager {
+	private Vector<Market> markets = null;
+	
+	public MarketManager(){
+		markets = new Vector<Market>();
+	}
+
+	public void addMarket(String market){
+		markets.add(new Market(market));
+	}
+	
+	public Vector<Market> getMarkets(){
+		return markets;
+	}
+	public String printMarkets(){
+		String retour="";
+		int i= 0;
+		for (Market m : markets)
+		{
+			retour+=("Market "+i+" : "+m.toString()+"\n");
+			i++;
+		}
+		return retour;
+	}
+	
+	public void removeMarkets(){
+		markets.clear();
+	}
+}

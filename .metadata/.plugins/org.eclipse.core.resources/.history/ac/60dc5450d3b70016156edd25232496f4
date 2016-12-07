@@ -1,0 +1,26 @@
+package MODEL;
+
+public class Market {
+	
+	private String market = null;
+
+	
+	
+	public Market(String marketM)
+	{
+		market = marketM;
+
+		
+	}
+
+	
+	public String getMarket(){
+		return market;
+	}
+
+	public String toString(){
+		return market;
+		
+	}
+
+}

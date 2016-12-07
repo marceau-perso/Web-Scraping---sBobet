@@ -1,0 +1,54 @@
+package MODEL;
+
+import java.util.Vector;
+
+public class Bet {
+	private Match match = null;
+	private String market = null;
+	private String odds = null;
+
+	
+	
+	public Bet(Match matchID, String marketM,String oddsH)
+	{
+		match = matchID;
+		market = marketM;
+		odds = oddsH;
+
+		
+	}
+	public Bet(Match matchID, String marketM,String oddsH, String oddsA )
+	{
+		match = matchID;
+		market = marketM;
+		odds1 = oddsH;
+		odds2 = oddsA;
+		
+	}
+	
+	public Match getMatch(){
+		return match;
+	}
+	public String getMarket(){
+		return market;
+	}
+	public String getOdds1(){
+		return odds1;
+	}
+	public String getOdds2(){
+		return odds2;
+	}
+	public String getOddsD(){
+		return oddsD;
+	}
+	public String toString(){
+		if(oddsD.equals(null)){
+			return "Match "+match.toString()+" ; odds1 "+odds1+" ; odds2 "+odds2;
+		}
+		else{
+			return "Match "+match.toString()+" ; odds1 "+odds1+" ; odds2 "+odds2+" ; oddsD "+oddsD;
+		}
+		
+	}
+
+}

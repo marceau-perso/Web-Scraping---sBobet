@@ -1,0 +1,28 @@
+package MODEL;
+
+import java.util.Vector;
+
+public class MatchManager {
+	
+	private Vector<Match> matches = null;
+	public MatchManager(){
+		matches = new Vector<Match>();
+	}
+	public void addMatch(String idMatch,String dt, String home, String away,String lig){
+		matches.add(new Match(idMatch,dt, home, away,lig));
+	}
+	
+	public Vector<Match> getMatches(){
+		return matches;
+	}
+	
+	public String printMatches(){
+		String retour="";
+		for (Match m : matches)
+		{
+			retour+=(m.toString());
+		}
+		return retour;
+	}
+
+}

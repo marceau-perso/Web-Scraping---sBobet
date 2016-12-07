@@ -1,0 +1,48 @@
+#tableMatches,#tableHistory{
+    -fx-background-color: #B0D7FA;
+    -fx-font-family:  "Helvetica";
+    -fx-color:  #5DA2DF;
+   
+}
+
+#cMatches,#cLigues,#cDate,#cMarket{
+	 -fx-background-color: #5DA2DF;
+}
+
+#tablePendingBets{
+    -fx-background-color: #FAC5CC;
+    -fx-color:  #D84E69;
+    -fx-font-family:  "Helvetica";
+   
+}
+
+.table-view .column-header{
+    -fx-font-size: 16px;
+}
+
+.table-view {
+  -fx-table-cell-border-color: transparent;
+}
+
+.table-view .table-row-cell {
+  -fx-border-width: 1;
+}
+
+.table-cell {
+    -fx-font-size: 14px;
+}
+
+#tableBets{
+    -fx-background-color: #78EEF3;
+    -fx-font-family:  "Helvetica";
+    -fx-color:  #1F8388;
+   
+}
+
+#title{
+    -fx-background-color: #B6BFC6;
+}
+
+#tilte_1{
+	-fx-background-color: #BABFC9;
+}

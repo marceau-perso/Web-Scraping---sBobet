@@ -1,0 +1,33 @@
+package MODEL;
+
+import java.util.Vector;
+
+public class BetManager {
+	private Vector<Bet> bets = null;
+	
+	public BetManager(){
+		bets = new Vector<Bet>();
+	}
+	
+	public void addBet(String matchID, String marketM,String oddsH, String oddsA, String oddsDraw  ){
+		bets.add(new Bet(matchID,marketM,oddsH,oddsA,oddsDraw));
+	}
+	public void addBet(String matchID, String marketM,String oddsH, String oddsA){
+		bets.add(new Bet(matchID,marketM,oddsH,oddsA));
+	}
+	
+	public Vector<Bet> getBets(){
+		return bets;
+	}
+	public String printBets(){
+		String retour="";
+		int i= 0;
+		for (Bet b : bets)
+		{
+			retour+=("Bet "+i+" : "+b.toString()+"\n");
+			i++;
+		}
+		return retour;
+	}
+
+}

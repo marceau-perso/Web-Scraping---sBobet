@@ -1,0 +1,10 @@
+package MODEL;
+
+public class Bet {
+	
+	public Bet()
+	{
+		
+	}
+
+}

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<TabPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="CONTROLLER.Controller">
+   <tabs>
+      <Tab text="SIte">
+         <content>
+            <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0">
+               <children>
+                  <TitledPane animated="false" layoutY="103.0" prefHeight="298.0" prefWidth="600.0" text="Products">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="253.0" prefWidth="450.0">
+                           <children>
+                              <TableView fx:id="tableProducts" editable="true" layoutX="4.0" layoutY="2.0" prefHeight="231.0" prefWidth="592.0">
+                                <columns>
+                                  <TableColumn fx:id="colHome" prefWidth="82.0" text="Home" />
+                                  <TableColumn fx:id="colAway" prefWidth="97.0" text="Away" />
+                                    <TableColumn fx:id="colChamp" prefWidth="95.0" text="Champ" />
+                                    <TableColumn fx:id="colIssue" prefWidth="106.96865844726562" text="Issue" />
+                                    <TableColumn fx:id="colOdd" minWidth="0.0" prefWidth="105.95193481445312" text="Odd" />
+                                    <TableColumn fx:id="colQuantity" prefWidth="103.04806518554688" text="Quantity" />
+                                </columns>
+                              </TableView>
+                              <Button fx:id="_send_button" contentDisplay="CENTER" layoutX="492.0" layoutY="236.0" minWidth="100.0" mnemonicParsing="false" onAction="#sendRequest" prefHeight="26.0" text="Send" wrapText="true" />
+                              <Button layoutX="4.0" layoutY="236.0" mnemonicParsing="false" onAction="#removeProduct" text="-" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
+                  <TitledPane animated="false" layoutX="-63.0" layoutY="-74.0" text="untitled" />
+                  <TitledPane animated="false" layoutY="-2.0" prefHeight="76.0" prefWidth="599.0" text="  Home              Away                Champ              Issue                   Odd                    Quantity">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TextField fx:id="new_home" layoutX="4.0" layoutY="11.0" prefHeight="26.0" prefWidth="90.0" />
+                              <TextField fx:id="new_away" layoutX="102.0" layoutY="11.0" prefHeight="26.0" prefWidth="90.0" />
+                              <TextField fx:id="new_champ" layoutX="200.0" layoutY="11.0" prefHeight="26.0" prefWidth="90.0" />
+                              <TextField fx:id="new_odd" layoutX="402.0" layoutY="11.0" prefHeight="26.0" prefWidth="90.0" />
+                              <TextField fx:id="new_quantity" layoutX="499.0" layoutY="11.0" prefHeight="26.0" prefWidth="90.0" />
+                              <TextField fx:id="new_issue" layoutX="299.0" layoutY="11.0" prefWidth="90.0" />
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
+                  <Button layoutX="563.0" layoutY="76.0" mnemonicParsing="false" onAction="#addProduct" text="+" />
+               </children>
+            </Pane>
+         </content>
+      </Tab>
+      <Tab text="Spider">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+               <children>
+                  <TitledPane animated="false" prefHeight="150.0" prefWidth="600.0" text="Products">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="111.0" prefWidth="585.0">
+                           <children>
+                              <TableView fx:id="serverProducts" editable="true" layoutX="1.0" layoutY="1.0" prefHeight="122.0" prefWidth="595.0">
+                                 <columns>
+                                    <TableColumn fx:id="scolHome" prefWidth="82.0" text="Home" />
+                                    <TableColumn fx:id="scolAway" prefWidth="97.0" text="Away" />
+                                    <TableColumn fx:id="scolChamp" prefWidth="95.0" text="Champ" />
+                                    <TableColumn fx:id="scolIssue" prefWidth="106.96865844726562" text="Issue" />
+                                    <TableColumn fx:id="scolOdd" minWidth="0.0" prefWidth="105.95193481445312" text="Odd" />
+                                    <TableColumn fx:id="scolQuantity" prefWidth="103.04806518554688" text="Quantity" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
+                  <TitledPane animated="false" layoutY="186.0" prefHeight="174.0" prefWidth="600.0" text="Basket">
+                    <content>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <TableView fx:id="userProducts" prefHeight="147.0" prefWidth="600.0">
+                                 <columns>
+                                    <TableColumn fx:id="ucolHome" prefWidth="82.0" text="Home" />
+                                    <TableColumn fx:id="ucolAway" prefWidth="97.0" text="Away" />
+                                    <TableColumn fx:id="ucolChamp" prefWidth="95.0" text="Champ" />
+                                    <TableColumn fx:id="ucolIssue" prefWidth="106.96865844726562" text="Issue" />
+                                    <TableColumn fx:id="ucolOdd" minWidth="0.0" prefWidth="105.95193481445312" text="Odd" />
+                                    <TableColumn fx:id="ucolQuantity" prefWidth="103.04806518554688" text="Quantity" />
+                                 </columns>
+                              </TableView>
+                           </children>
+                        </AnchorPane>
+                    </content>
+                  </TitledPane>
+                  <Button layoutX="8.0" layoutY="150.0" mnemonicParsing="false" onAction="#addProductServer" text="+" />
+                  <Button layoutX="533.0" layoutY="150.0" mnemonicParsing="false" onAction="#search" text="Search" />
+                  <Button layoutX="9.0" layoutY="360.0" mnemonicParsing="false" onAction="#removeProductUser" text="-" />
+                  <Button layoutX="542.0" layoutY="360.0" mnemonicParsing="false" onAction="#buy" text="Buy" />
+               </children>
+            </AnchorPane>
+        </content>
+      </Tab>
+   </tabs>
+</TabPane>

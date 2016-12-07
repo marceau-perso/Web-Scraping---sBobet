@@ -1,0 +1,115 @@
+package MODEL;
+
+/**
+ * 
+ * @author K.Misho
+ * @date august '15
+ * @version 1.0
+ */
+
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.text.ParseException;
+import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import MODEL.League;
+
+
+public class Robot {
+		
+	private Spider webScrapper = null;
+	public Vector<WebDriver> browsers = null;
+	private String site = "https://www.sbobet.com/euro/football";
+	//private Vector<League> leagues 	= null;
+
+	
+	public Robot(){
+		browsers = new Vector<WebDriver>();
+	}
+	
+	public void loadSite(String src) throws InterruptedException, FileNotFoundException, UnsupportedEncodingException{
+		try {
+			webScrapper = new Spider(src,this);
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		//open the site
+		Thread.sleep(2000);
+		webScrapper.loadSite();
+		/*
+		//login
+		webScrapper.initUser("Qfasf", "213$Df");
+		Thread.sleep(7000);
+		webScrapper.login();
+		Thread.sleep(2000);
+		
+		//tmp confirm !! to be removed
+		while(webScrapper.getDriver().findElements(By.className("DWHomeBtn")).size()==0){}
+		*/
+		// GET LEAGUES
+		List<WebElement> WEleagues = webScrapper.getDriver().findElements(By.xpath("//*[@id='ms-all-tos-1-3']/ul/li[*]"));
+		ArrayList<String> links = new ArrayList<String>();
+		ArrayList<String> names = new ArrayList<String>();
+		for(WebElement we : WEleagues) {
+		    links.add(we.getAttribute("href"));
+		    names.add(we.getText());
+		    System.out.println(we.getText());
+		    System.out.println(we.getAttribute("href"));
+		    new League(we.getText());
+		}
+		/*try{
+			el.click();
+		}catch(NoSuchElementException e){
+			System.err.println("Deposit button not present");
+			return;
+		}*/
+		
+		Thread.sleep(3000);
+		//System.err.println(webScrapper.getDriver().getCurrentUrl());
+		//System.err.println("Element " + el.getAttribute("value"));
+		
+        //System.err.println(webScrapper.getDriver().getPageSource());
+		webScrapper.getDriver().navigate().refresh();
+
+		//while(webScrapper.getDriver().findElements(By.id("bu:sm:markets")).size()==0){}
+		
+		//webScrapper.getDriver().findElement(By.id("bu:sm:markets")).click();
+		
+	}
+	
+	public SboBet_Match searchMatch(Match match) throws InterruptedException{
+		SboBet_Match found_match = null;
+		System.err.println("Search : " + match.getHome());
+		try {
+			 found_match =   webScrapper.searchToday(match);
+			
+			 if(found_match == null)found_match =  webScrapper.searchEarlyMarket(match);
+			
+	       } catch (ParseException e) {
+			// TODO Auto-generated catch block
+	       		e.printStackTrace();
+	       }
+		 if(found_match != null) found_match.setIssue(match.getIssue());
+		 return found_match;
+	}
+	
+	public void killBrowsers(){
+		for(WebDriver web : browsers)
+			web.close();
+	}
+	
+	public void addBrowser(WebDriver web){
+		browsers.addElement(web);
+	}
+}

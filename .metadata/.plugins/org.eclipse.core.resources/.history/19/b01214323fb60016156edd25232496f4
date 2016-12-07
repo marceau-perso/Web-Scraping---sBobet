@@ -1,0 +1,23 @@
+package MODEL;
+
+import java.util.Vector;
+
+public class Bet {
+	private String match = null;
+	private String market = null;
+	
+	public Bet(String matchM, String marketM)
+	{
+		match = matchM;
+		market = marketM;
+		
+	}
+	
+	public String getMatch(){
+		return match;
+	}
+	public String getMarket(){
+		return market;
+	}
+
+}

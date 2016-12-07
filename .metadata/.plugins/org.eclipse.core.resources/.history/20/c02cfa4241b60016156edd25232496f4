@@ -1,0 +1,240 @@
+package MODEL;
+
+/**
+ * 
+ * @author K.Misho
+ * @date august '15
+ * @version 1.0
+ */
+
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.text.ParseException;
+import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import MODEL.League;
+import MODEL.LeagueManager;
+import MODEL.MatchManager;
+import MODEL.Bet;
+import MODEL.BetManager;
+
+
+public class Robot {
+		
+	private Spider webScrapper = null;
+	public Vector<WebDriver> browsers = null;
+	private String site = "https://www.sbobet.com/euro/football";
+	private  LeagueManager leagueManager = new LeagueManager();
+	private  MatchManager matchManager = new MatchManager();
+	private BetManager betManager = new BetManager();
+
+	
+	public Robot(){
+		browsers = new Vector<WebDriver>();
+	}
+	
+	public void loadSite(String src) throws InterruptedException, FileNotFoundException, UnsupportedEncodingException{
+		try {
+			webScrapper = new Spider(src,this);
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		//open the site
+		Thread.sleep(2000);
+		webScrapper.loadSite();
+		/*
+		//login
+		webScrapper.initUser("Qfasf", "213$Df");
+		Thread.sleep(7000);
+		webScrapper.login();
+		Thread.sleep(2000);
+		
+		//tmp confirm !! to be removed
+		while(webScrapper.getDriver().findElements(By.className("DWHomeBtn")).size()==0){}
+		*/
+		// GET LEAGUES
+		
+
+		/*try{
+			el.click();
+		}catch(NoSuchElementException e){
+			System.err.println("Deposit button not present");
+			return;
+		}*/
+		
+		Thread.sleep(3000);
+		//System.err.println(webScrapper.getDriver().getCurrentUrl());
+		//System.err.println("Element " + el.getAttribute("value"));
+		
+        //System.err.println(webScrapper.getDriver().getPageSource());
+		webScrapper.getDriver().navigate().refresh();
+
+		//while(webScrapper.getDriver().findElements(By.id("bu:sm:markets")).size()==0){}
+		
+		//webScrapper.getDriver().findElement(By.id("bu:sm:markets")).click();
+		
+	}
+	
+	public Vector<League> searchLeagues() throws InterruptedException, FileNotFoundException, UnsupportedEncodingException
+	{
+		try {
+			webScrapper = new Spider("",this);
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		//open the site
+		Thread.sleep(2000);
+		webScrapper.loadSite();
+		
+		List<WebElement> WEleagues = webScrapper.getDriver().findElements(By.xpath("//*[@id='ms-all-tos-1-3']/ul/li[*]"));
+		
+		ArrayList<String> names = new ArrayList<String>();
+		ArrayList<String> links = new ArrayList<String>();
+		int i = 0;
+		for(WebElement we : WEleagues) {
+			List<WebElement> childs = we.findElements(By.xpath(".//a"));
+			names.add(we.getText());
+			for(WebElement we2 : childs)
+			{
+				links.add(we2.getAttribute("href"));
+			}
+			leagueManager.addLeague(names.get(i), links.get(i));
+			i++;
+		}
+		Vector<League> listLeagues = leagueManager.getLeagues();
+		return listLeagues;
+	}
+	
+	public Vector<Match> searchMatches(League league) {
+		matchManager.removeMatches();
+		System.out.println("avant le search : "+matchManager.printMatches());
+		//on doit cliquer avant de lancer le scraping de la page 
+		WebElement link = webScrapper.getDriver().findElement(By.xpath("//*[contains(text(),'"+league.toString()+"')]"));
+		System.out.println(link.getText());
+		link.click();
+
+
+		
+		// ensuite on charge les données pour ce championnat
+		String[] matches;
+		WebElement WEmatches1X2Test = webScrapper.getDriver().findElement(By.xpath("//*[@class='NonLiveMarket']"));
+		matches = WEmatches1X2Test.getText().split(System.getProperty("line.separator"));
+		System.out.println("je suis ici bro");
+		int i = 0;
+		int j = 0;
+		ArrayList<String> away = new ArrayList<String>();
+		ArrayList<String> home = new ArrayList<String>();
+		ArrayList<String> oddsA = new ArrayList<String>();
+		ArrayList<String> draw = new ArrayList<String>();
+		ArrayList<String> oddsD = new ArrayList<String>();
+		ArrayList<String> oddsH = new ArrayList<String>();
+		ArrayList<String> date = new ArrayList<String>();
+		ArrayList<String> market = new ArrayList<String>();
+		
+		String marketString=matches[0];
+
+		while((i+j)<matches.length)
+		{
+			if(matches[i+j].equals("1X2"))
+			{
+				System.out.println(matches[i+j]);
+				marketString=matches[i+j];
+				j++;
+				continue;
+			}
+			
+			if(matches[i+j].equals("First Half 1X2"))
+			{
+				System.out.println(matches[i+j]);
+				marketString=matches[i+j];
+				j++;
+				continue;
+			}
+
+			switch(i%9){
+				case 0: date.add("date :"+matches[i+j]) ;
+				market.add(marketString);
+					break;
+				case 1: break;
+				case 2: oddsH.add(matches[i+j]);
+					break;
+				case 3: home.add(matches[i+j]);
+					break;
+				case 4: oddsD.add(matches[i+j]);
+					break;
+				case 5: draw.add(matches[i+j]);
+					break;
+				case 6: oddsA.add(matches[i+j]);
+					break;
+				case 7 : away.add(matches[i+j]);
+					break;
+				case 8 : break;
+			}
+			i++;
+		}
+
+		i=0;
+		while(i<(home.size()))
+		{
+			if(home.get(i)!=null )
+			{
+				matchManager.addMatch(home.get(i) +"-"+ away.get(i)+"-"+market.get(i), date.get(i), home.get(i), away.get(i), league.toString(), oddsH.get(i), oddsA.get(i),market.get(i),draw.get(i),oddsD.get(i));
+			}
+			i++;
+		}
+		System.out.println("apres le search"+matchManager.printMatches());
+		Vector<Match> listMatches = matchManager.getMatches();
+		return listMatches;
+	}
+	
+	public Vector<Bet> searchBet(){
+		
+		// crawler pour recuperer le lien des endroits ou sont les bets
+		List<WebElement> WEbets = webScrapper.getDriver().findElements(By.xpath("//*[@class='IconMarkets']"));
+		
+		// crawler pour recuperer les bets en eux meme
+		
+		
+		Vector<Bet> listBets = betManager.getBets();
+		return listBets;
+		
+	}
+	
+	public SboBet_Match searchMatch(Match match) throws InterruptedException{
+		SboBet_Match found_match = null;
+		System.err.println("Search : " + match.getHome());
+		try {
+			 found_match =   webScrapper.searchToday(match);
+			
+			 if(found_match == null)found_match =  webScrapper.searchEarlyMarket(match);
+			
+	       } catch (ParseException e) {
+			// TODO Auto-generated catch block
+	       		e.printStackTrace();
+	       }
+		 if(found_match != null) found_match.setIssue(match.getIssue());
+		 return found_match;
+	}
+	
+	public void killBrowsers(){
+		for(WebDriver web : browsers)
+			web.close();
+	}
+	
+	public void addBrowser(WebDriver web){
+		browsers.addElement(web);
+	}
+}

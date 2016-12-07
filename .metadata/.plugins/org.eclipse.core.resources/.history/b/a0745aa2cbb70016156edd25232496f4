@@ -1,0 +1,12 @@
+package MODEL;
+
+import java.util.Vector;
+
+public class MarketManager {
+	private Vector<Market> markets = null;
+	
+	public MarketManager(){
+		markets = new Vector<Market>();
+	}
+
+}
