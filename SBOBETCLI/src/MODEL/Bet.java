@@ -8,7 +8,7 @@ public class Bet {
 	private String content = null;
 	private String odds = null;
 	//For some bets we need more information
-	private String detail = null;
+	private String detail = "";
 
 	public Bet(String marketM,String oddsH,String name1)
 	{

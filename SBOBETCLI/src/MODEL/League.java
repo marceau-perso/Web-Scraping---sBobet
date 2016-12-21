@@ -2,8 +2,8 @@ package MODEL;
 
 /**
  * 
- * @author K.Misho
- * @date august '15
+ * @author marceau
+ * @date Decembre '1
  * @version 1.0
  */
 

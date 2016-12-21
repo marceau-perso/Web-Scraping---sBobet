@@ -19,6 +19,7 @@ public class View extends Application{
 	@Override
 	public void start(Stage stage) throws Exception {
 		// TODO Auto-generated method stub
+
 		FXMLLoader fxml = new FXMLLoader(getClass().getResource("/VIEW/WebRobot.fxml"));
 		Parent root = fxml.load();
 		cont = fxml.getController();

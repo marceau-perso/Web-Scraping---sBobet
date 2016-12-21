@@ -1,0 +1,98 @@
+package MODEL;
+
+
+/**
+ * 
+ * @author K.Misho
+ * @date august '15
+ * @version 1.0
+ */
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.ParseException;
+import java.util.Vector;
+import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.ElementNotVisibleException;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.thoughtworks.selenium.webdriven.commands.Open;
+
+public class Spider {
+	
+	// the site that is being analysed
+	private String site = "https://www.sbobet.com/euro/football/england";
+	
+	// the driver linked with the current site
+	private static WebDriver driver = null;
+	
+	//the master Robot
+	private Robot robot = null;
+	
+	// the script associated to every product
+	private Vector<Scrap> product_elements;
+	
+	// the list of  every product
+	private Vector<Match> products;
+	
+	
+	public Spider(String src,Robot rob) throws MalformedURLException, InterruptedException{
+		robot = rob;
+		//DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		//driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), capabilities);
+		System.setProperty("webdriver.chrome.driver", "/Users/Marceau/Documents/workspace_apache/chromedriver");
+		driver = new ChromeDriver();
+		//driver = new HtmlUnitDriver();
+		//((HtmlUnitDriver) driver).setJavascriptEnabled(true);
+		//driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+		// add the driver to be managed by robot at the end of a search
+		//rob.addBrowser(driver);
+		//site = src;
+		products = new Vector<Match>();
+		product_elements = new Vector<Scrap>();
+	}
+	
+	public WebDriver getDriver(){
+		return driver;
+	}
+	
+
+	
+	/**
+	 * @param username
+	 * @param Password
+	 *     	  Logins into the website, by entering provided username and
+	 *        password
+	 */
+
+	 
+	/**
+	 * Open the test website.
+	 * @throws InterruptedException 
+	 */
+	public void loadSite() throws InterruptedException {
+		// load the site
+		
+		driver.get(site);
+		
+		//wait about 2 sec for the javascript to load completly
+		waitJScript();
+	}
+	
+	
+	public void waitJScript(){
+		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+	}
+
+}

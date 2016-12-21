@@ -38,14 +38,10 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import CONTROLLER.QueryTimerTask;
-import MODEL.HttpURLConn;
 import MODEL.League;
 import MODEL.Match;
-import MODEL.Product;
 import MODEL.Robot;
 import MODEL.Scrap;
-import MODEL.httpGet;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ChangeListener;
@@ -78,7 +74,7 @@ import VIEW.View_History;
 public class History_Controller {
 	private WebDriver 						driver 			= null;
 	private	Robot 							robot 			= null;
-	private	QueryTimerTask 					task			= null;
+	//private	QueryTimerTask 					task			= null;
 	private	java.util.Timer 				timer			= null;
 	private HashMap<String,Vector<Match>>   historyMatches  = null;
 	// UI elements for the new product

@@ -3,8 +3,8 @@ package MODEL;
 
 /**
  * 
- * @author K.Misho
- * @date august '15
+ * @author M.Leriche
+ * @date december '12
  * @version 1.0
  */
 
@@ -46,8 +46,6 @@ public class Spider {
 	// the list of  every product
 	private Vector<Match> products;
 	
-	// the user 
-	private User user = null;
 	
 	public Spider(String src,Robot rob) throws MalformedURLException, InterruptedException{
 		robot = rob;
@@ -59,7 +57,7 @@ public class Spider {
 		//((HtmlUnitDriver) driver).setJavascriptEnabled(true);
 		//driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 		// add the driver to be managed by robot at the end of a search
-		rob.addBrowser(driver);
+		//rob.addBrowser(driver);
 		//site = src;
 		products = new Vector<Match>();
 		product_elements = new Vector<Scrap>();
@@ -69,9 +67,7 @@ public class Spider {
 		return driver;
 	}
 	
-	public void initUser(String username, String Password){
-		user = new User(username, Password);
-	}
+
 	
 	/**
 	 * @param username
@@ -79,11 +75,7 @@ public class Spider {
 	 *     	  Logins into the website, by entering provided username and
 	 *        password
 	 */
-	public void login() {
-		user.get_username_script(driver).sendKeys(user.getUsername());
-		user.get_password_script(driver).sendKeys(user.getPassword());
-		user.get_confirm_script(driver).click();
-	}
+
 	 
 	/**
 	 * Open the test website.
@@ -98,66 +90,6 @@ public class Spider {
 		waitJScript();
 	}
 	
-	public SboBet_Match searchEarlyMarket(Match product) throws ParseException, InterruptedException {
-		Scrap scrap_match = null; // the matched to be scraped
-		//site+=product.getLigue();
-		/*driver.navigate().refresh();
-
-		while(driver.findElements(By.id("bu:sm:markets")).size()==0){}
-		
-		driver.findElement(By.id("bu:sm:markets")).click();
-		 */
-		JavascriptExecutor jse = (JavascriptExecutor)driver;
-		jse.executeScript("scroll(250, 0)"); //x value '250' can be altered
-
-		while(driver.findElements(By.id("bu:sm:market:2")).size()==0){}
-
-		try{
-			driver.findElement(By.id("bu:sm:market:2")).click();
-		}catch(ElementNotVisibleException e){
-			driver.findElement(By.id("bu:sm:markets")).click();
-			System.err.println("New error found");
-			driver.findElement(By.id("bu:sm:market:2")).click();
-		}catch(StaleElementReferenceException e){
-			System.err.println("Element not attached : another request is being processed");
-			return null;
-		}
-
-		
-		scrap_match = new Scrap(driver,product);
-		product_elements.add(scrap_match);
-		return scrap_match.getScrapedMatch();
-	}
-	
-	public SboBet_Match searchToday(Match product) throws ParseException, InterruptedException {
-		Scrap scrap_match = null; // the matched to be scraped
-		//site+=product.getLigue();
-		/*driver.navigate().refresh();
-
-		while(driver.findElements(By.id("bu:sm:markets")).size()==0){}
-			driver.findElement(By.id("bu:sm:markets")).click();
-		 */	
-		JavascriptExecutor jse = (JavascriptExecutor)driver;
-		jse.executeScript("scroll(1000, 0)"); //x value '250' can be altered
-
-		while(driver.findElements(By.id("bu:sm:market:1")).size()==0){}
-		// possible error  !!!!!!!!!!!!
-		try{
-			driver.findElement(By.id("bu:sm:market:1")).click();
-		}catch(ElementNotVisibleException e){
-			driver.findElement(By.id("bu:sm:markets")).click();
-			System.err.println("New error found");
-			driver.findElement(By.id("bu:sm:market:1")).click();
-		}catch(StaleElementReferenceException e){
-			System.err.println("Element not attached : another request is being processed");
-			return null;
-		}
-
-		
-		scrap_match = new Scrap(driver,product);
-		product_elements.add(scrap_match);
-		return scrap_match.getScrapedMatch();
-	}
 	
 	public void waitJScript(){
 		driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);

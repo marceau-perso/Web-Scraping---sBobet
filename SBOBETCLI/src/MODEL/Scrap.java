@@ -34,7 +34,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import MODEL.XMLBuilder;
 
 public class Scrap {
 	//regx expresions
@@ -48,7 +47,7 @@ public class Scrap {
 	static 		Pattern pattern_im 				= null;
 	
 	//Found match
-	private 	SboBet_Match new_match 			= null;
+	//private 	SboBet_Match new_match 			= null;
 	
 	// product info
 	private 	String page_product 			= "";
@@ -78,215 +77,10 @@ public class Scrap {
 		driver 			= driv;
 		bets_element 	= new Vector<WebElement>();
 		product 		= prod;
-		init();
-	}
-	
-	public SboBet_Match getScrapedMatch(){
-		return new_match;
+		//init();
 	}
 	
 	
-	public void init() throws ParseException, InterruptedException{
-		System.err.println("------------------------");
-		Thread.sleep(3000);
-		try{
-			analyzePage();
-		}catch(StaleElementReferenceException e){
-			System.err.println("Error in server !!");
-			System.err.println(e);
-			return;
-		}
-		
-		analyse_bet();
-		if(new_match != null)System.err.println(new_match.toString());
-		// Only for the client not the server
-		if(new_match != null){
-			System.err.println(new_match.toString());
-			WebElement el_to_scroll_to = driver.findElement(By.id(new_match.getContent()));
-			((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", el_to_scroll_to);
-			JavascriptExecutor jse = (JavascriptExecutor)driver;
-			jse.executeScript("scroll(0, -150)"); //x value '250' can be altered
-
-			Thread.sleep(1000);
-			el_to_scroll_to.click();
-			Thread.sleep(2000);
-			putStake();
-			Thread.sleep(2000);
-			driver.switchTo().alert().accept();
-		}
-		 
-		//if(getConfirmElement() != null) getConfirmElement().click();
-		System.err.println("++++++++++++++++++++++++");
-		//this.closeBrowser();
-	}
-	
-	//analyze all the page to find the corresponding match
-	public SboBet_Match analyzePage() throws StaleElementReferenceException{
-		
-		String 		teams 		= null;
-		String 		league   	= null;
-		String 		HDP 		= null;
-		String 		HDP_H 		= null;
-		String 		HDP_A 		= null;
-		String 		HDP_UO 		= null;
-		String 		HDP_U 		= null;
-		String 		HDP_O 		= null;
-		String 		time 		= null;
-		boolean 	found 		= false;
-		
-		page_product = driver.getCurrentUrl().toString();
-		// Get only non live bets
-
-		WebElement odds_non_live = null;
-		try{
-			while(driver.findElements(By.id("odds-display-nonlive")).size()==0){}
-			
-			odds_non_live= driver.findElement(By.id("odds-display-nonlive"));
-		}catch(NoSuchElementException e){
-			return null;
-		}
-		
-		while(driver.findElements(By.tagName("tbody")).size()==0){}
-		java.util.List<WebElement> bodies = odds_non_live.findElements(By.tagName("tbody"));
-		((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", bodies.get(bodies.size()-1));
-		
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try{
-			while(driver.findElements(By.id("odds-display-nonlive")).size()==0){}
-			
-			odds_non_live= driver.findElement(By.id("odds-display-nonlive"));
-			while(driver.findElements(By.tagName("tbody")).size()==0){}
-			
-			bodies = odds_non_live.findElements(By.tagName("tbody"));}catch(NoSuchElementException e){
-			return null;
-		}
-		
-		System.err.println("Matches"+"\n"+bodies.size());
-		int i = 0; 
-		WebElement el_to_scroll_to_home = null,
-				   el_to_scroll_to_away = null;
-		while(driver.findElements(By.className("Blue")).size()==0){}
-		java.util.List<WebElement> span_names = odds_non_live.findElements(By.className("Blue"));
-		for(WebElement el : span_names){
-			if(el.getText().contains(product.getHome()) || el.getText().contains(product.getAway())){
-				el_to_scroll_to_home = el;
-				System.err.println("Found 1 : "+el.getText());
-				break;
-			}
-			
-		}
-		while(driver.findElements(By.className("Red")).size()==0){}
-		java.util.List<WebElement> span_names_2 = odds_non_live.findElements(By.className("Red"));
-		
-		System.err.println("Home : " + product.getHome()+" Away : "+ product.getAway());
-		
-		for(WebElement el : span_names_2){
-			if(el.getText().contains(product.getHome()) || el.getText().contains(product.getAway())){
-				el_to_scroll_to_away = el;
-				System.err.println("Found 2 : "+el.getText());
-				break;
-			}
-			
-		}
-		
-		if(el_to_scroll_to_away!=null && el_to_scroll_to_home != null){
-			//((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", el_to_scroll_to);
-			
-		}
-		else{
-			System.err.println("!!!!!!! Not found");
-			return null;
-		}
-		
-		WebElement parentElement = null;
-		if(el_to_scroll_to_home != null){ parentElement = el_to_scroll_to_home.findElement(By.xpath("./.."));
-		parentElement = parentElement.findElement(By.xpath("./.."));
-		parentElement = parentElement.findElement(By.xpath("./.."));
-		//System.err.println(parentElement.getText());
-		}
-		System.err.println("Matches :"+bodies.size()+" | Match index :"+bodies.indexOf(parentElement));
-		if(bodies.indexOf(parentElement)>3)bodies = bodies.subList(bodies.indexOf(parentElement)-4,bodies.size()-1);
-		
-		for(WebElement match : bodies){
-			if(found){
-				String attr = match.getAttribute("class");
-				//System.out.println(attr);
-				if(attr.contains("subrow")){
-					bets_element.addElement(match);			
-				}
-				else
-					break;
-			}else
-			if(i>1){
-		
-				if(i%18==0)((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", match);
-
-				if(match.findElements(By.className("league-row")).size()==0){
-					time = match.findElement(By.className("time-column-content")).getText();
-
-					int ii=1;// important information starts from the 3rd td element
-					
-					//3->match ; 4->HDP 5->HDP_H 6->HDP_A 7->HDP_UO; 8-> HDP_U; 0->HDP_O
-					for(WebElement odds : match.findElements(By.tagName("td"))){
-						if(ii>=3){
-							//System.out.println("TD "+odds.getText());	
-							switch(ii){
-							case 3: teams = odds.getText();
-								break;
-							case 4: HDP = odds.getText();
-								break;
-							case 5: HDP_H = odds.getText();
-								break;
-							case 6: HDP_A = odds.getText();
-								break;
-							case 7: HDP_UO = odds.getText();
-								break;
-							case 8: HDP_U = odds.getText();
-								break;
-							case 9: HDP_O = odds.getText();
-								break;
-								default:
-									System.err.println("HDP parsing error!!");
-							}
-						}
-						ii++;
-						if(ii==10)
-							break;// up to the 9th td only FT and UO no HT!!!
-					}
-			/*
-					String attr = match.getAttribute("class");
-		    
-					System.out.println(attr);
-		
-					if(!attr.contains("subrow"))
-						System.out.println("-------Match---------");
-					System.out.println("TIME : "+time);
-					System.out.println("-"+teams+" ; "+HDP+":"+HDP_H+":"+HDP_A+":"+HDP_UO+":"+HDP_U+":"+HDP_O+"-");
-			*/
-					if(teams != null && teams.contains(product.getHome())){
-						bet_element = match;
-						bets_element.add(match);
-						new_match = new SboBet_Match(time,teams.split("\n")[0],teams.split("\n")[1],league);
-						new_match.setIssue(product.getIssue());
-						found = true;
-					}
-				}else{
-					league = match.getText();
-				}
-			
-			}
-			i++;
-		
-		
-		}
-		
-		return new_match;
-	}
 	
 	public WebElement get_stake_script(){
 		String _val = "stake";
@@ -305,97 +99,7 @@ public class Scrap {
 		return stake_confirm;
 	}
 	
-	// analyze all the information for the found match
-	public void analyse_bet(){
-		
-		String teams 	= null;
-		String HDP 		= null;
-		String HDP_H 	= null;
-		String HDP_A 	= null;
-		String HDP_UO 	= null;
-		String HDP_U 	= null;
-		String HDP_O 	= null;
-		String time 	= null;
-		
-		for(WebElement match : bets_element){
-			
-			time = match.findElement(By.className("time-column-content")).getText();
-			
-			//System.out.println(team_name);
-			int ii=1;// important information starts from the 3rd td element
-			//3->match ; 4->HDP 5->HDP_H 6->HDP_A 7->HDP_UO; 8-> HDP_U; 0->HDP_O
-			// store the element id for the corresponding issue
-			for(WebElement odds : match.findElements(By.tagName("td"))){
-				if(ii>=3){
-					//System.out.println("TD "+odds.getText());	
-					switch(ii){
-					case 3: teams = odds.getText();
-						break;
-					case 4: HDP = odds.getText();
-						break;
-					case 5: HDP_H = odds.getText();
-						java.util.List<WebElement> span_h = odds.findElements(By.tagName("span"));
-						String content_h = null;
-						for(WebElement el : span_h)
-							if(el.getAttribute("id") != null)
-								content_h = el.getAttribute("id");
-						if(new_match.getIssue().substring(0, 1).equalsIgnoreCase("h")&&new_match.getIssue().substring(2).equalsIgnoreCase(HDP))
-							new_match.addContent(content_h);
-						break;
-					case 6: HDP_A = odds.getText();
-						java.util.List<WebElement> span_a = odds.findElements(By.tagName("span"));
-						String content_a = null;
-						for(WebElement el : span_a)
-							if(el.getAttribute("id") != null)
-								content_a = el.getAttribute("id");
-						if(new_match.getIssue().substring(0, 1).equalsIgnoreCase("a")&&new_match.getIssue().substring(2).equalsIgnoreCase(HDP))
-							new_match.addContent(content_a);
-					
-						break;
-					case 7: HDP_UO = odds.getText();
-						break;
-					case 8: HDP_U = odds.getText();
-						java.util.List<WebElement> span_u = odds.findElements(By.tagName("span"));
-						String content_u = null;
-						for(WebElement el : span_u)
-							if(el.getAttribute("id") != null)
-								content_u = el.getAttribute("id");
-						
-						if(new_match.getIssue().substring(0, 1).equalsIgnoreCase("u")&&new_match.getIssue().substring(2).equalsIgnoreCase(HDP_UO))
-							new_match.addContent(content_u);
-				
-						break;
-					case 9: HDP_O = odds.getText();
-						java.util.List<WebElement> span_o = odds.findElements(By.tagName("span"));
-						String content_o = null;
-						for(WebElement el : span_o)
-							if(el.getAttribute("id") != null)
-								content_o = el.getAttribute("id");
-						if(new_match.getIssue().substring(0, 1).equalsIgnoreCase("o")&&new_match.getIssue().substring(2).equalsIgnoreCase(HDP_UO))
-							new_match.addContent(content_o);
-				
-						break;
-						default:
-							System.err.println("HDP parsing error!!");
-					}
-				}
-				ii++;
-				if(ii==10)
-					break;// up to the 9th td only FT and UO no HT!!!
-			}
-			String attr = match.getAttribute("class");
-			
-			System.out.println(attr);
-			if(!attr.contains("subrow"))
-				System.out.println("-------Match---------");
-			System.out.println("TIME : "+time);
-			System.out.println("-"+teams+" ; "+HDP+":"+HDP_H+":"+HDP_A+":"+HDP_UO+":"+HDP_U+":"+HDP_O+"-");
-			
-			new_match.addHDP_HA(HDP, Double.parseDouble(HDP_H), Double.parseDouble(HDP_A));
-			new_match.addHPD_UO(HDP_UO, Double.parseDouble(HDP_U), Double.parseDouble(HDP_O));
-			
-		}
-	}
+	
 	// Finds the element to be clicked to validate an item
 	
 	public WebElement getConfirmElement(){

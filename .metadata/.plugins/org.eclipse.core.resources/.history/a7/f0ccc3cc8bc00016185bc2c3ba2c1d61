@@ -1,0 +1,192 @@
+package CONTROLLER;
+
+/**
+ * 
+ * @author K.Misho
+ * @date august '15
+ * @version 1.0
+ */
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimerTask;
+import java.util.Vector;
+import java.util.Timer;
+
+import javax.swing.JOptionPane;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+
+import javafx.collections.ObservableList;
+import MODEL.BetResult;
+import MODEL.Match;
+import MODEL.Match;
+import MODEL.Scrap;
+import MODEL.Spider;
+
+public class QueryTimerTask extends TimerTask{
+	public static 	int 				tick_unit 			= 90000;
+	private BetResult 					responseMatches 	= null;
+	private Controller 					controller 			= null;
+	private QueryTimerTask				query_parent	 	= null;
+	private Match 						request 			= null;
+	private ObservableList<Match> 		req 				= null;
+	private Map<QueryTimerTask,Timer> 	betReq 				= null;
+	private QueryTimerTask 				task 				= null;
+	private WebDriver					driver				= null;
+	
+	public QueryTimerTask( Controller m,QueryTimerTask c){
+		controller 		= m;
+		query_parent 	= c;
+		betReq 			= new HashMap<QueryTimerTask,Timer>();
+		driver			= m.getDriver();
+	}
+	
+	public void setRequest(Match req){
+		request = req;
+	}
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+
+		if(req == null) {
+			
+				HttpURLConn http = new HttpURLConn();
+				//httpGet get = new httpGet();
+				String req3 = null;
+				try {
+					System.err.println("robot_bet?id="+request.getID()+"&&issue="+request.getIssue()+"&&odd="+request.getOdd());
+					req3 = http.sendGet("robot_bet?id="+request.getID()+"&&issue="+request.getIssue()+"&&odd="+request.getOdd()+"");
+					
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				//responseMatches = get.handleGetReq3(req3);
+			    int choice = -2;
+				// show the confirm dialog only if confirmation is checked
+				if(responseMatches!= null && responseMatches.getResult().equalsIgnoreCase("1")){
+					if(request.confirmProperty().getValue()==true)
+						choice = JOptionPane.showConfirmDialog(null,
+							    "New Update!"+" : "+responseMatches.getMatch()+" | "+responseMatches.getOdd());
+						
+					//putStake(choice);
+					System.err.println("Choice : "+choice+"");
+					//controller.removePendingMatch(request);
+					query_parent.req.remove(request);
+					query_parent.betReq.get(this).cancel();
+					request.updateOdd(responseMatches.getOdd());
+					writeToHistory(request);
+	
+				}else if(responseMatches!= null && responseMatches.getResult().equalsIgnoreCase("0")){
+					request.updateOdd(responseMatches.getOdd());
+				}/*else if(responseMatches!= null && responseMatches.getResult().equalsIgnoreCase("-1")){
+					
+					writeToHistory(request);
+					controller.removePendingMatch(request);
+					query_parent.req.remove(request);
+					query_parent.betReq.get(this).cancel();
+				}
+				*/
+				return; 
+		}
+		//model.dataServer.clear();
+		for(Match p : req){
+			
+			QueryTimerTask task = new QueryTimerTask(controller,this);
+			Timer timer = new java.util.Timer();
+			task.setRequest(p);
+			timer.schedule(task, 2000, QueryTimerTask.tick_unit);
+			betReq.put(task,timer);
+			
+		}
+		
+		if(req.size() == 0){
+			this.cancel();
+			System.err.println("-------------All tasks finished completely-------------");	
+		}
+		
+	}
+	
+	/*public void putStake(int choice){
+		// -2 default value for choice
+		if(choice == 0 || choice == -2)
+			try {
+				
+				controller.getRobot().searchMatch(request);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			/*
+			 * {
+			driver.findElement(By.id(responseMatches.getId())).click();
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			putStake();
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			driver.switchTo().alert().accept();
+		}
+		
+		
+			
+			
+		
+	}*/
+	
+	public WebElement get_stake_script(){
+		String _val = "stake";
+		WebElement stake_script = driver.findElement(By.id(_val));
+		return stake_script;
+	}
+	
+	public void putStake() {
+		get_stake_script().sendKeys("100");
+		get_confirm_script().click();
+	}
+	
+	public WebElement get_confirm_script(){
+		String _val = "tk:tk:submittc";
+		WebElement stake_confirm = driver.findElement(By.id(_val));
+		return stake_confirm;
+	}
+	
+	public void closeAllTasks(){
+		for(Timer t : betReq.values())
+			t.cancel();
+		betReq.clear();
+	}
+	
+	public void writeToHistory(Match match){
+		try
+		{
+		    String filename= "History.txt";
+		    FileWriter fw = new FileWriter(filename,true); //the true will append the new data
+		    fw.write(match.toHistory()+"\n");//appends the string to the file
+		    fw.close();
+		}
+		catch(IOException ioe)
+		{
+		    System.err.println("IOException: " + ioe.getMessage());
+		}
+	}
+	
+	public void setReq(ObservableList<Match> req){
+		this.req = req;
+	}
+
+}

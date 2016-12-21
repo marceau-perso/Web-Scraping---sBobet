@@ -1,0 +1,249 @@
+package MODEL;
+
+/**
+ * 
+ * @author K.Misho
+ * @date august '15
+ * @version 1.0
+ */
+
+import java.util.Vector;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+public class httpGet {
+	
+	public httpGet(){
+		
+	}
+	public static void test(String[] args) throws Exception {
+		 
+		HttpURLConn http = new HttpURLConn();
+		httpGet get = new httpGet();
+		String req1 = null;
+		String req2 = null;
+		String req3 = null;
+ 
+		System.out.println("Testing 1 - Send Http GET request");
+		req1 = http.sendGet("robot?matches=all");
+		
+		System.out.println("Testing 1 - Send Http GET request");
+		req2 = http.sendGet("robot_match?id=10");
+		
+		System.out.println("Testing 1 - Send Http GET request");
+		req3 = http.sendGet("robot_bet?id=11&&issue=x&&odd_1=1.2&&odd_2=3.2&&stake=150");
+ 
+		System.out.println("\nTesting 2 - Send Http POST request");
+		//http.sendPost();
+		
+		get.handleGetReq1(req1);
+ 
+	}
+	/**
+	 * @author K.Misho
+	 * @param str
+	 */
+	/*public Vector<League> handleGetReq1(String str){
+		
+		Vector<League> leagues = new Vector<League>();
+		
+		Document doc =null;
+		if(str != null) doc = XMLBuilder.convertStringToDocument(str);
+		else return null;
+		
+		String str1 = XMLBuilder.convertDocumentToString(doc);
+		if(doc == null) return null;
+		else System.out.println("Ok doc");
+		
+		try {
+			doc.getDocumentElement().normalize();
+			 
+			System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+		 
+			NodeList nListLeagues = doc.getElementsByTagName("league");
+		 
+			System.out.println("----------------------------");
+		 
+			for (int temp = 0; temp < nListLeagues.getLength(); temp++) {
+		 
+				Node nNodeLeague = nListLeagues.item(temp);
+				League league = null;
+		 
+				System.err.println("\nCurrent League :" + nNodeLeague.getNodeName());
+		 
+				if (nNodeLeague.getNodeType() == Node.ELEMENT_NODE) {
+		 
+					Element eElement = (Element) nNodeLeague;
+		 
+					System.err.println("League id : " + eElement.getAttribute("id"));
+					league = new League(eElement.getAttribute("id"));
+					NodeList nListMatches = eElement.getElementsByTagName("match");
+					 
+					System.out.println("----------------------------");
+				 
+					for (int temp2 = 0; temp2 < nListMatches.getLength(); temp2++) {
+				 
+						Match match = null;
+						Node nListMatch = nListMatches.item(temp2);
+				 
+						//System.out.println("\nCurrent Match :" + nListMatch.getNodeName());
+				 
+						if (nListMatch.getNodeType() == Node.ELEMENT_NODE) {
+				 
+							Element eElementmatch = (Element) nListMatch;
+							String id = eElementmatch.getAttribute("id");
+							String date = eElementmatch.getElementsByTagName("date").item(0).getTextContent();
+							String hTeam = eElementmatch.getElementsByTagName("home").item(0).getTextContent();
+							String aTeam = eElementmatch.getElementsByTagName("away").item(0).getTextContent();
+							
+							System.out.println("Match id : " + id);
+							System.out.println("Date  : " + date);
+							System.out.println("Home : " + hTeam);
+							System.out.println("Away : " + aTeam);
+							
+							match = new Match(id,date,hTeam,aTeam,"");
+						}
+						league.addMatch(match);
+					}
+					leagues.add(league);
+				}
+			}
+		    } catch (Exception e) {
+			e.printStackTrace();
+		    }
+		return leagues;
+	 }*/
+	
+	/**
+	 * @author K.Misho
+	 * @param str
+	 */
+	/*public Vector<Match> handleGetReq2(String str){
+		
+		Vector<Match> matches = new Vector<Match>();
+		Document doc =null;
+		if(str != null) doc = XMLBuilder.convertStringToDocument(str);
+		else System.out.println("Ok str");
+		
+		String str1 = XMLBuilder.convertDocumentToString(doc);
+		if(doc == null) return null;
+		else System.out.println("Ok doc");
+		
+		try {
+			doc.getDocumentElement().normalize();
+			 
+			System.out.println("Root element :" + doc.getDocumentElement().getNodeName());
+		 
+		
+					NodeList nListMatches = doc.getElementsByTagName("match");
+					 
+					System.out.println("----------------------------");
+				 
+					for (int temp2 = 0; temp2 < nListMatches.getLength(); temp2++) {
+				 
+						Node nListMatch = nListMatches.item(temp2);
+						Match match = null;
+						System.out.println("\nCurrent Match :" + nListMatch.getNodeName());
+				 
+						if (nListMatch.getNodeType() == Node.ELEMENT_NODE) {
+				 				 
+							Element eElementmatch = (Element) nListMatch;
+							String id = eElementmatch.getAttribute("id");
+							String date = eElementmatch.getElementsByTagName("date").item(0).getTextContent();
+							String hTeam = eElementmatch.getElementsByTagName("home").item(0).getTextContent();
+							String aTeam = eElementmatch.getElementsByTagName("away").item(0).getTextContent();
+							String ligue = eElementmatch.getElementsByTagName("ligue").item(0).getTextContent();
+							
+							/*
+							System.out.println("Match id : " + id);
+							System.out.println("Date  : " + date);
+							System.out.println("Home : " + hTeam);
+							System.out.println("Away : " + aTeam);
+							*/
+							/*match = new Match(id,date,hTeam,aTeam,ligue);
+							NodeList Issues = eElementmatch.getElementsByTagName("issues");
+							NodeList nListIssues = ((Element)Issues.item(0)).getElementsByTagName("issue");
+							System.out.println("----------------------------");
+						 
+							for (int temp3 = 0; temp3 < nListIssues.getLength(); temp3++) {
+						 
+								Node nListMatchIssue = nListIssues.item(temp3);
+						 
+									if (nListMatch.getNodeType() == Node.ELEMENT_NODE) {
+						 
+									Element eElementmatchIssue = (Element) nListMatchIssue;
+									//System.out.println("\nIssue:" + eElementmatchIssue.getTextContent());
+									match.addIssue(eElementmatchIssue.getTextContent());
+									
+								}
+							}
+							matches.add(match);
+						}
+					}
+					
+		    } catch (Exception e) {
+			e.printStackTrace();
+		    }
+		return matches;
+	}*/
+	
+	/**
+	 * @author K.Misho
+	 * @param str
+	 */
+	/*public BetResult handleGetReq3(String str){
+		BetResult bet = null;
+		Document doc =null;
+		if(str != null) doc = XMLBuilder.convertStringToDocument(str);
+		else {
+			System.err.println("Empty string handleReq 3");
+			return null;
+		}
+	
+		
+		String str1 = XMLBuilder.convertDocumentToString(doc);
+		if(doc == null) return null ;
+		
+		
+		try {
+			doc.getDocumentElement().normalize();
+				NodeList nListMatches = doc.getElementsByTagName("match");
+				
+					for (int temp2 = 0; temp2 < nListMatches.getLength(); temp2++) {
+				 
+						Node nListMatch = nListMatches.item(temp2);
+						if (nListMatch.getNodeType() == Node.ELEMENT_NODE) {
+				 
+							Element eElementmatch = (Element) nListMatch;
+							
+							String id = eElementmatch.getAttribute("id");
+							String res = eElementmatch.getElementsByTagName("result").item(0).getTextContent();
+							String issue = eElementmatch.getElementsByTagName("issue").item(0).getTextContent();
+							String odd = eElementmatch.getElementsByTagName("odd").item(0).getTextContent();
+							String url = eElementmatch.getElementsByTagName("url_link").item(0).getTextContent();
+							String content = eElementmatch.getElementsByTagName("content_id").item(0).getTextContent();
+							
+							System.out.println("------------Response from server-------------");
+							System.out.println("Match id : " + id);
+							System.out.println("Result  : " + res);
+							System.out.println("Issue : " + issue);
+							System.out.println("Odd : " + odd);
+							System.out.println("url_link : " + url);
+							System.out.println("content_id : " + content);
+							System.out.println("-------------      End        --------------");
+							
+							bet = new BetResult(id,res,issue,odd,url,content);
+						
+						}
+					}
+					
+		    } catch (Exception e) {
+			e.printStackTrace();
+		    }
+		return bet;
+	 }		*/ 
+}

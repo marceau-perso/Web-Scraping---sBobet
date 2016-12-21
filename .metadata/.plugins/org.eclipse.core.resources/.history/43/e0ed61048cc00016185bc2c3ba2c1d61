@@ -1,0 +1,197 @@
+package CONTROLLER;
+
+/**
+ * 
+ * @author M.Leriche
+ * @date december '12
+ * @version 1.0
+ */
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Vector;
+
+import javax.swing.JOptionPane;
+
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
+
+import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.ComboBoxTableCell;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.MouseEvent;
+import MODEL.League;
+import MODEL.LeagueManager;
+import MODEL.Match;
+import MODEL.MatchManager;
+import MODEL.Market;
+import MODEL.MarketManager;
+import MODEL.Bet;
+import MODEL.BetManager;
+import MODEL.Robot;
+import MODEL.Scrap;
+import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.scene.Group;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn.CellEditEvent;
+import javafx.scene.control.TablePosition;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TableView.TableViewSelectionModel;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
+import javafx.util.Callback;
+import javafx.util.converter.DefaultStringConverter;
+import VIEW.View_History;
+
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.jboss.netty.handler.codec.http.HttpResponse;
+import org.apache.http.message.BasicNameValuePair;
+
+
+
+public class Controller {
+	private 	WebDriver 				driver 				= null;
+	private 	Robot 					robot 				= null;
+	private 	QueryTimerTask 			task				= null;
+	private 	java.util.Timer 		timer				= null;
+	
+	private boolean 					stop_send 			= true;
+	
+	// UI elements for the new product
+	
+
+
+	@FXML
+	private 	Button 					bSearch				= null;
+	
+	private 	Vector<League> 			leagues 			= null;
+	private 	Vector<Match> 			responseMatches 	= null;
+	private 	ObservableList<String> 	levelChoice 		=  null;
+	private 	ObservableList<Match> 	data 				= FXCollections.observableArrayList();
+	private 	ObservableList<Match> 	pendingBets 		= FXCollections.observableArrayList();
+	private 	ObservableList<Match> 	dataUser 			= FXCollections.observableArrayList();
+	private 	ObservableList<Bet> 	dataBets 			= FXCollections.observableArrayList();
+
+
+	@FXML
+	private 	Slider 					sSlider  			= null;
+	@FXML private ComboBox cLigues;
+
+	
+	private 	int 						selectedRow 	= 	-1;
+	private		int 						selectedRowServ = 	-1;
+	private 	int 						selectedRowUser = 	-1;
+	LeagueManager leagueManager = new LeagueManager();
+	Vector<League> listLeagues = leagueManager.getLeagues();
+	MatchManager matchManager = new MatchManager();
+	Vector<Match> listMatches = matchManager.getMatches();
+	BetManager betManager = new BetManager();
+	Vector<Bet> listBets = betManager.getBets();
+	MarketManager marketManager = new MarketManager();
+	Vector<Market> listMarkets = marketManager.getMarkets();
+	
+
+	public Controller(){
+		robot = new Robot();
+		//client = new Client(robot);
+		//driver = new ChromeDriver();
+		//task = new QueryTimerTask(this,null);
+	}
+	
+	public WebDriver getDriver(){
+		return driver;
+	}
+	
+	public Robot getRobot(){
+		return robot;
+	}
+	
+	
+
+	public void initialize() throws FileNotFoundException, UnsupportedEncodingException, InterruptedException{
+		//récuperation de la liste des ligues du football anglais
+		listLeagues = robot.searchLeagues();
+		for(League league : listLeagues){
+			cLigues.getItems().add(league.toString());
+		}
+		
+		bSearch.setOnAction(new EventHandler<ActionEvent>() {
+		    @Override public void handle(ActionEvent e) {
+		    	
+		    	League l = listLeagues.get(cLigues.getSelectionModel().getSelectedIndex());
+		    	double days = sSlider.getValue();
+		    	
+		    	System.out.println("la ligue selectionnée : "+l.toString());
+		    	System.out.println("la date selectionnée : "+days);		    	
+		    	if(l.toString().contains("Outright")){
+	
+	              }else {
+	            	  
+	            	  // il faut creer un searchAll qui va se balader pour chaque journée, 
+	            	  //et lancer un searchMatch + searchBets a partir de ces liens
+		              try {
+						listBets = robot.searchAll(l,days);
+						//plus qu'a gérer quand il n'y a pas de match sur un jour car il veut cliquer sur des choses qui nexistent pas
+					} catch (InterruptedException e3) {
+						// TODO Auto-generated catch block
+						e3.printStackTrace();
+					}
+		            //export en CSV de ma liste de bets dans mon workspace
+		              String fileName="export.csv";
+	            	  CsvFileWriter writer = new CsvFileWriter();
+		              writer.writeCsvFile(fileName, listBets, l);
+	            	  
+	            	  
+
+	              }
+		    }
+		});
+		
+	}
+	
+
+}

@@ -197,13 +197,9 @@ public class Match {
 	}
 	
 	
+	
 	public String toString(){
-		if(market.equals("")){
-			return date + ";" +" Match : "+ hTeam + " ("+odd_1+") - ("+odd_2+") " + aTeam+";";
-		}
-		else{
-			return " Match : "+ hTeam + " ("+odd_1+") - ("+odd_2+") " + aTeam+" -  Draw  ("+odd_3+")";
-		}
+		return " Match : "+ hTeam +" - "+ aTeam+";";
 		
 		
 	}
